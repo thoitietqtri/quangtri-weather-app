@@ -1,4 +1,0 @@
-body, html, #root { margin:0; padding:0; height:100%; display:flex; }
-.card { padding:16px; font-family:Arial; }
-table { width:100%; border-collapse:collapse; }
-th,td { border:1px solid #ccc; padding:4px; }
