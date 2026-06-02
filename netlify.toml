@@ -1,1 +1,3 @@
-
+[build]
+  command = "cd quangtri-weather-app && npm install && npm run build"
+  publish = "quangtri-weather-app/dist"
