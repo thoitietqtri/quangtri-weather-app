@@ -1,8 +1,41 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  background: #f0f0f0;
+}
+
+#root {
+  height: 100%;
+  min-height: 100vh;
+}
+
 .leaflet-container {
   width: 100% !important;
   height: 100vh !important;
+  background: #cce0ff !important;
 }
-body, html, #root { margin:0; padding:0; height:100%; display:flex; }
-.card { padding:16px; font-family:Arial; }
-table { width:100%; border-collapse:collapse; }
-th,td { border:1px solid #ccc; padding:4px; }
+
+.card {
+  padding: 16px;
+  font-family: Arial;
+  background: white;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid #ccc;
+  padding: 4px;
+}
