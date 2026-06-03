@@ -13,11 +13,14 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 18
 
@@ -28,10 +31,10 @@ jobs:
           npm run build
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v2
+        uses: actions/upload-pages-artifact@v3
         with:
           path: quangtri-weather-app/dist
 
       - name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v2
-
+        id: deployment
+        uses: actions/deploy-pages@v4
