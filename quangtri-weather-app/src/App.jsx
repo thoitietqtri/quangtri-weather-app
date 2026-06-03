@@ -43,7 +43,7 @@ export default function App() {
   const [weather, setWeather] = useState(null)
 
   useEffect(() => {
-    fetch('/PX_QUANGTRI.geojson')
+    fetch('/quangtri-weather-app/PX_QUANGTRI.geojson')
       .then(res => res.json())
       .then(setGeoData)
   }, [])
