@@ -46,6 +46,7 @@ export default function App() {
     fetch('/quangtri-weather-app/PX_QUANGTRI.geojson')
       .then(res => res.json())
       .then(setGeoData)
+      .catch(err => console.error('GeoJSON error:', err))
   }, [])
 
   const onEach = (feature, layer) => {
@@ -58,12 +59,22 @@ export default function App() {
   }
 
   return (
-    <div style={{display:'flex',height:'100vh'}}>
-      <MapContainer center={[16.8,107.1]} zoom={9} style={{flex:1}}>
-        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-        {geoData && <GeoJSON data={geoData} onEachFeature={onEach} />}
-      </MapContainer>
-      <div style={{width:400,overflowY:'auto'}}>{weather && <WeatherPopup data={weather} />}</div>
+    <div style={{width:'100vw', height:'100vh', display:'flex', overflow:'hidden'}}>
+      <div style={{flex:1, position:'relative'}}>
+        <MapContainer 
+          center={[16.8, 107.1]} 
+          zoom={9} 
+          style={{width:'100%', height:'100%', position:'absolute', top:0, left:0}}
+        >
+          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          {geoData && <GeoJSON data={geoData} onEachFeature={onEach} />}
+        </MapContainer>
+      </div>
+      {weather && (
+        <div style={{width:400, overflowY:'auto', background:'white', zIndex:1000}}>
+          <WeatherPopup data={weather} />
+        </div>
+      )}
     </div>
   )
 }
