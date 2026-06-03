@@ -1,0 +1,27 @@
+.responsive-map {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+button {
+  font-size: 16px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+input[type="date"] {
+  font-size: 16px;
+  padding: 6px;
+  border-radius: 6px;
+}
