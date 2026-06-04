@@ -5,15 +5,29 @@ import L from 'leaflet';
 import './MapComponent.css';
 import WeatherChart from './WeatherChart';
 
+function getCanhBao(tmax, tmin, wind, rain) {
+  const warnings = [];
+
+  if (tmax >= 38) warnings.push({ text: '🔥 Cảnh báo nắng nóng gay gắt', color: '#cc0000' });
+  else if (tmax >= 35) warnings.push({ text: '☀️ Cảnh báo nắng nóng', color: '#ff6600' });
+
+  if (tmin < 13) warnings.push({ text: '🥶 Cảnh báo rét hại', color: '#0000cc' });
+  else if (tmin < 15) warnings.push({ text: '❄️ Cảnh báo rét đậm', color: '#3399ff' });
+
+  if (wind > 16) warnings.push({ text: '🌊 Cảnh báo gió mạnh, sóng lớn trên biển', color: '#6600cc' });
+
+  if (rain > 200) warnings.push({ text: '🌊 Cảnh báo sạt lở đất, ngập lụt vùng trũng thấp và hạ du các sông', color: '#cc0066' });
+  else if (rain > 100) warnings.push({ text: '⚠️ Cảnh báo sạt lở đất', color: '#cc6600' });
+
+  return warnings;
+}
+
 function MapComponent() {
   const [selectedFeature, setSelectedFeature] = useState(null);
   const [weatherData, setWeatherData] = useState(null);
-  const [weatherOW, setWeatherOW] = useState(null);
   const [weatherById, setWeatherById] = useState({});
   const [selectedDate, setSelectedDate] = useState('');
   const [geoData, setGeoData] = useState(null);
-
-  const OPENWEATHER_KEY = '724acaddbed244f61b696130723cd9a3';
 
   useEffect(() => {
     fetch('/quangtri-weather-app/PX_QUANGTRI.geojson')
@@ -57,13 +71,11 @@ function MapComponent() {
     return { color: '#000', weight: 1, fillColor: getColorByTemperature(temp), fillOpacity: 0.6 };
   };
 
-  const fetchWeather = async (center, date) => {
+  const fetchWeather = async (center) => {
     const lat = center.lat;
     const lon = center.lng;
-    const d = date || selectedDate;
     let urlMeteo = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,precipitation,windspeed_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,windspeed_10m_max&timezone=auto`;
-    if (d) urlMeteo += `&start_date=${d}&end_date=${d}`;
-
+    if (selectedDate) urlMeteo += `&start_date=${selectedDate}&end_date=${selectedDate}`;
     try {
       const res = await fetch(urlMeteo);
       const data = await res.json();
@@ -71,33 +83,6 @@ function MapComponent() {
     } catch (err) {
       console.error('Lỗi Open-Meteo:', err);
     }
-
-    try {
-      const res = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${OPENWEATHER_KEY}&units=metric`);
-      const data = await res.json();
-      setWeatherOW(data);
-    } catch (err) {
-      console.error('Lỗi OpenWeather:', err);
-    }
-  };
-
-  const aggregateOWDaily = () => {
-    if (!weatherOW?.list) return null;
-    let tmax = -Infinity, tmin = Infinity, rainSum = 0, windSum = 0, count = 0;
-    const todayStr = new Date().toISOString().split('T')[0];
-    for (const item of weatherOW.list) {
-      const dateStr = item.dt_txt.split(' ')[0];
-      if (dateStr === todayStr) {
-        const temp = item.main.temp;
-        if (temp > tmax) tmax = temp;
-        if (temp < tmin) tmin = temp;
-        rainSum += item.rain?.['3h'] || 0;
-        windSum += item.wind.speed;
-        count++;
-      }
-    }
-    if (count === 0) return null;
-    return { tmax: tmax.toFixed(1), tmin: tmin.toFixed(1), rain: rainSum.toFixed(1), wind: (windSum / count).toFixed(1) };
   };
 
   const handleFeatureClick = async (e) => {
@@ -106,7 +91,6 @@ function MapComponent() {
     const name = feature.properties.ten || feature.properties.Ten || feature.properties.name || 'Không rõ';
     setSelectedFeature({ center, name });
     setWeatherData(null);
-    setWeatherOW(null);
     await fetchWeather(center);
   };
 
@@ -133,33 +117,50 @@ function MapComponent() {
     const tmin = daily.temperature_2m_min[0];
     const rain = daily.precipitation_sum[0];
     const wind = daily.windspeed_10m_max[0];
-    const owDaily = aggregateOWDaily();
+    const windMs = parseFloat((wind / 3.6).toFixed(1));
+    const warnings = getCanhBao(tmax, tmin, windMs, rain);
 
     return (
       <Popup position={center}>
         <div style={{
-          fontSize: '14px', fontWeight: 'bold', lineHeight: '1.6',
+          fontSize: '14px', fontWeight: 'bold', lineHeight: '1.7',
           color: '#333', border: '3px solid #2196f3', borderRadius: '8px',
           padding: '10px', background: '#f5f5f5',
-          boxShadow: '0 2px 10px rgba(0,0,0,0.3)', minWidth: '200px'
+          boxShadow: '0 2px 10px rgba(0,0,0,0.3)', minWidth: '220px'
         }}>
           <div style={{ fontSize: '16px', color: '#2196f3', marginBottom: '4px' }}>{name}</div>
           <div style={{ fontSize: '13px', marginBottom: '8px', fontWeight: 'normal' }}>
             Ngày dự báo: {selectedDate || 'Hôm nay'}
           </div>
-          <div style={{ fontWeight: 'bold' }}>Trị số dự báo:</div>
+
+          <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>Trị số dự báo:</div>
           <div>🌡️ Tmax: {tmax}°C</div>
           <div>🌡️ Tmin: {tmin}°C</div>
           <div>☔ Mưa: {rain} mm</div>
-          <div>💨 Gió: {(wind / 3.6).toFixed(1)} m/s</div>
-          {owDaily && (
-            <>
-              <div style={{ fontWeight: 'bold', marginTop: '8px' }}>OpenWeather (Hôm nay):</div>
-              <div>🌡️ Tmax: {owDaily.tmax}°C</div>
-              <div>🌡️ Tmin: {owDaily.tmin}°C</div>
-              <div>☔ Mưa: {owDaily.rain} mm</div>
-              <div>💨 Gió TB: {owDaily.wind} m/s</div>
-            </>
+          <div>💨 Gió: {windMs} m/s</div>
+
+          {warnings.length > 0 && (
+            <div style={{
+              marginTop: '10px', padding: '8px',
+              background: '#fff3cd', borderRadius: '6px',
+              border: '1px solid #ffc107'
+            }}>
+              <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>⚠️ Cảnh báo thiên tai:</div>
+              {warnings.map((w, i) => (
+                <div key={i} style={{ color: w.color, fontWeight: 'bold', fontSize: '13px' }}>{w.text}</div>
+              ))}
+            </div>
+          )}
+
+          {warnings.length === 0 && (
+            <div style={{
+              marginTop: '10px', padding: '6px 8px',
+              background: '#d4edda', borderRadius: '6px',
+              border: '1px solid #28a745', color: '#155724',
+              fontSize: '13px', fontWeight: 'bold'
+            }}>
+              ✅ Không có cảnh báo thiên tai
+            </div>
           )}
         </div>
       </Popup>
@@ -167,12 +168,12 @@ function MapComponent() {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
       <h2 style={{ textAlign: 'center', padding: '8px', margin: 0, background: '#fff', borderBottom: '1px solid #ddd' }}>
         DỰ BÁO THỜI TIẾT CHO XÃ/PHƯỜNG TỈNH QUẢNG TRỊ
       </h2>
 
-      <div style={{ flex: 1, position: 'relative' }}>
+      <div style={{ position: 'relative' }}>
         {geoData ? (
           <MapContainer center={[16.75, 107.1]} zoom={8} className="responsive-map">
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
@@ -180,7 +181,7 @@ function MapComponent() {
             {renderPopup()}
           </MapContainer>
         ) : (
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '65vh' }}>
             ⏳ Đang tải bản đồ...
           </div>
         )}
@@ -209,4 +210,3 @@ function MapComponent() {
 }
 
 export default MapComponent;
-
