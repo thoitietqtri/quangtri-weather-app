@@ -17,20 +17,29 @@ function getCanhBao(tmax, tmin, wind, rain) {
   return warnings;
 }
 
-// Label marker cho tên xã/phường
 function createLabelIcon(name) {
   return L.divIcon({
     className: '',
     html: `<div style="
-      font-size:10px;
-      font-weight:bold;
-      color:#000;
-      text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff, 0 0 4px #fff;
-      white-space:nowrap;
-      pointer-events:none;
-      text-align:center;
+      font-size:10px;font-weight:bold;color:#000;
+      text-shadow:-1px -1px 0 #fff,1px -1px 0 #fff,-1px 1px 0 #fff,1px 1px 0 #fff,0 0 4px #fff;
+      white-space:nowrap;pointer-events:none;text-align:center;
     ">${name}</div>`,
     iconAnchor: [0, 0],
+  });
+}
+
+function createIslandIcon(name) {
+  return L.divIcon({
+    className: '',
+    html: `<div style="
+      font-size:13px;font-weight:bold;color:#cc0000;
+      text-shadow:-1px -1px 0 #fff,1px -1px 0 #fff,-1px 1px 0 #fff,1px 1px 0 #fff,0 0 6px #fff;
+      white-space:nowrap;pointer-events:none;text-align:center;
+      background:rgba(255,255,255,0.7);padding:3px 6px;border-radius:4px;
+      border:1.5px solid #cc0000;
+    ">🇻🇳 ${name}</div>`,
+    iconAnchor: [60, 10],
   });
 }
 
@@ -49,7 +58,6 @@ function MapComponent() {
       .then(r => r.json())
       .then(data => {
         setGeoData(data);
-        // Tạo danh sách địa danh
         const list = data.features.map(f => ({
           name: f.properties.ten || f.properties.Ten || f.properties.name || '',
           feature: f
@@ -114,10 +122,7 @@ function MapComponent() {
     setSelectedFeature({ center, name });
     setWeatherData(null);
     await fetchWeather(center);
-    // Pan bản đồ đến vị trí
-    if (mapRef.current) {
-      mapRef.current.setView([center.lat, center.lng], 11);
-    }
+    if (mapRef.current) mapRef.current.setView([center.lat, center.lng], 11);
   };
 
   const handleFeatureClick = async (e) => {
@@ -159,10 +164,9 @@ function MapComponent() {
     return (
       <Popup position={center}>
         <div style={{
-          fontSize: '14px', fontWeight: 'bold', lineHeight: '1.7',
-          color: '#333', border: '3px solid #2196f3', borderRadius: '8px',
-          padding: '10px', background: '#f5f5f5',
-          boxShadow: '0 2px 10px rgba(0,0,0,0.3)', minWidth: '220px'
+          fontSize: '14px', fontWeight: 'bold', lineHeight: '1.7', color: '#333',
+          border: '3px solid #2196f3', borderRadius: '8px', padding: '10px',
+          background: '#f5f5f5', boxShadow: '0 2px 10px rgba(0,0,0,0.3)', minWidth: '220px'
         }}>
           <div style={{ fontSize: '16px', color: '#2196f3', marginBottom: '4px' }}>{name}</div>
           <div style={{ fontSize: '13px', marginBottom: '8px', fontWeight: 'normal' }}>
@@ -172,7 +176,7 @@ function MapComponent() {
           <div>🌡️ Tmax: {tmax}°C</div>
           <div>🌡️ Tmin: {tmin}°C</div>
           <div>☔ Mưa: {rain} mm</div>
-          <div>💨 Gió Max: {windMs} m/s</div>
+          <div>💨 Gió max: {windMs} m/s</div>
           {warnings.length > 0 ? (
             <div style={{ marginTop: '10px', padding: '8px', background: '#fff3cd', borderRadius: '6px', border: '1px solid #ffc107' }}>
               <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>⚠️ Cảnh báo thiên tai:</div>
@@ -190,7 +194,6 @@ function MapComponent() {
     );
   };
 
-  // Label markers cho tên xã/phường
   const renderLabels = () => {
     if (!geoData) return null;
     return geoData.features.map((feature, i) => {
@@ -199,12 +202,7 @@ function MapComponent() {
       const layer = L.geoJSON(feature);
       const center = layer.getBounds().getCenter();
       return (
-        <Marker
-          key={i}
-          position={[center.lat, center.lng]}
-          icon={createLabelIcon(name)}
-          interactive={false}
-        />
+        <Marker key={i} position={[center.lat, center.lng]} icon={createLabelIcon(name)} interactive={false} />
       );
     });
   };
@@ -215,35 +213,45 @@ function MapComponent() {
         DỰ BÁO THỜI TIẾT CHO XÃ/PHƯỜNG TỈNH QUẢNG TRỊ
       </h2>
 
-      {/* Menu chọn địa danh */}
-      <div style={{ padding: '8px 16px', background: '#f0f4ff', borderBottom: '1px solid #ddd', display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+      {/* Thanh công cụ: menu chọn địa danh + chọn ngày + làm mới */}
+      <div style={{ padding: '8px 16px', background: '#f0f4ff', borderBottom: '1px solid #ddd', display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
         <label style={{ fontWeight: 'bold', color: '#333' }}>📍 Chọn xã/phường:</label>
         <select
           value={selectedName}
-          onChange={(e) => {
-            setSelectedName(e.target.value);
-            selectFeatureByName(e.target.value);
-          }}
-          style={{ fontSize: '15px', padding: '6px 10px', borderRadius: '6px', border: '1px solid #aaa', minWidth: '220px' }}
+          onChange={(e) => { setSelectedName(e.target.value); selectFeatureByName(e.target.value); }}
+          style={{ fontSize: '15px', padding: '6px 10px', borderRadius: '6px', border: '1px solid #aaa', minWidth: '200px' }}
         >
           <option value="">-- Chọn địa danh --</option>
           {featureList.map((f, i) => (
             <option key={i} value={f.name}>{f.name}</option>
           ))}
         </select>
+
+        <label style={{ fontWeight: 'bold', color: '#333', marginLeft: '8px' }}>📅 Ngày dự báo:</label>
+        <input
+          type="date"
+          value={selectedDate}
+          onChange={(e) => setSelectedDate(e.target.value)}
+          style={{ fontSize: '15px', padding: '6px', borderRadius: '6px', border: '1px solid #aaa' }}
+        />
+
+        <button onClick={handleRefresh} style={{ marginLeft: '4px' }}>🔁 Làm mới</button>
+
+        <span style={{ fontStyle: 'italic', color: '#007bff', fontSize: '13px' }}>
+          (Chọn ngày rồi nhớ click Làm mới)
+        </span>
       </div>
 
       <div style={{ position: 'relative' }}>
         {geoData ? (
-          <MapContainer
-            center={[16.75, 107.1]}
-            zoom={8}
-            className="responsive-map"
-            ref={mapRef}
-          >
+          <MapContainer center={[16.75, 107.1]} zoom={8} className="responsive-map" ref={mapRef}>
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
             <GeoJSON data={geoData} onEachFeature={onEachFeature} style={geoJsonStyle} key={JSON.stringify(weatherById)} />
             {renderLabels()}
+            {/* Label Hoàng Sa */}
+            <Marker position={[16.5, 112.0]} icon={createIslandIcon('Đặc khu Hoàng Sa - Việt Nam')} interactive={false} />
+            {/* Label Trường Sa */}
+            <Marker position={[10.5, 114.5]} icon={createIslandIcon('Đặc khu Trường Sa - Việt Nam')} interactive={false} />
             {renderPopup()}
           </MapContainer>
         ) : (
@@ -251,19 +259,6 @@ function MapComponent() {
             ⏳ Đang tải bản đồ...
           </div>
         )}
-      </div>
-
-      <div style={{ padding: '10px', textAlign: 'center', background: '#fff', borderTop: '1px solid #ddd' }}>
-        <div style={{ marginBottom: '8px', fontStyle: 'italic', fontWeight: 'bold', color: '#007bff' }}>
-          Chọn ngày dự báo và nhớ click nút Làm mới
-        </div>
-        <button onClick={handleRefresh}>🔁 Làm mới</button>
-        <input
-          type="date"
-          value={selectedDate}
-          onChange={(e) => setSelectedDate(e.target.value)}
-          style={{ marginLeft: '10px' }}
-        />
       </div>
 
       {weatherData?.hourly && (
