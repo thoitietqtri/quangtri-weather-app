@@ -54,7 +54,7 @@ function MapComponent() {
   const mapRef = useRef(null);
 
   useEffect(() => {
-    fetch('/quangtri-weather-app/PX_QUANGTRI.geojson')
+    fetch('/PX_QUANGTRI.geojson')
       .then(r => r.json())
       .then(data => {
         setGeoData(data);
