@@ -209,12 +209,12 @@ function MapComponent() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <h2 style={{ textAlign: 'center', padding: '8px', margin: 0, background: '#fff', borderBottom: '1px solid #ddd' }}>
+      <h2 className="app-title">
         DỰ BÁO THỜI TIẾT CHO XÃ/PHƯỜNG TỈNH QUẢNG TRỊ
       </h2>
 
       {/* Thanh công cụ: menu chọn địa danh + chọn ngày + làm mới */}
-      <div style={{ padding: '8px 16px', background: '#f0f4ff', borderBottom: '1px solid #ddd', display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+      <div className="toolbar">
         <label style={{ fontWeight: 'bold', color: '#333' }}>📍 Chọn xã/phường:</label>
         <select
           value={selectedName}
@@ -237,8 +237,8 @@ function MapComponent() {
 
         <button onClick={handleRefresh} style={{ marginLeft: '4px' }}>🔁 Làm mới</button>
 
-        <span style={{ fontStyle: 'italic', color: '#007bff', fontSize: '13px' }}>
-          (Chọn ngày rồi nhớ click Làm mới)
+        <span className="toolbar-hint">
+          (Chọn ngày dự báo rồi nhớ click Làm mới)
         </span>
       </div>
 
