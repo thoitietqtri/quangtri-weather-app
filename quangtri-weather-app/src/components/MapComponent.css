@@ -1,22 +1,23 @@
 .responsive-map {
   width: 100%;
-  height: 65vh;
+  height: 60vh;
 }
 
 @media (max-width: 768px) {
   .responsive-map {
-    height: 50vh;
+    height: 45vh;
   }
 }
 
 button {
-  font-size: 16px;
-  padding: 8px 12px;
+  font-size: 15px;
+  padding: 7px 12px;
   border-radius: 8px;
   background-color: #007bff;
   color: #fff;
   border: none;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 button:hover {
@@ -24,12 +25,106 @@ button:hover {
 }
 
 input[type="date"] {
-  font-size: 16px;
+  font-size: 15px;
   padding: 6px;
   border-radius: 6px;
+  border: 1px solid #aaa;
+}
+
+@media (max-width: 768px) {
+  button {
+    font-size: 13px;
+    padding: 6px 10px;
+  }
+  input[type="date"] {
+    font-size: 13px;
+    padding: 5px;
+  }
 }
 
 .chart-container {
   width: 100%;
   height: 200px;
+}
+
+@media (max-width: 768px) {
+  .chart-container {
+    height: 150px;
+  }
+}
+
+.toolbar {
+  padding: 8px 16px;
+  background: #f0f4ff;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .toolbar {
+    padding: 5px 8px;
+    gap: 5px;
+  }
+}
+
+.toolbar label {
+  font-weight: bold;
+  color: #333;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .toolbar label {
+    font-size: 11px;
+  }
+}
+
+.toolbar select {
+  font-size: 14px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid #aaa;
+  min-width: 160px;
+  flex: 1;
+}
+
+@media (max-width: 768px) {
+  .toolbar select {
+    font-size: 11px;
+    padding: 4px 6px;
+    min-width: 100px;
+  }
+}
+
+.toolbar-hint {
+  font-style: italic;
+  color: #007bff;
+  font-size: 13px;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .toolbar-hint {
+    font-size: 10px;
+  }
+}
+
+.app-title {
+  text-align: center;
+  padding: 8px;
+  margin: 0;
+  background: #fff;
+  border-bottom: 1px solid #ddd;
+  font-size: 20px;
+}
+
+@media (max-width: 768px) {
+  .app-title {
+    font-size: 13px;
+    padding: 5px;
+  }
 }
