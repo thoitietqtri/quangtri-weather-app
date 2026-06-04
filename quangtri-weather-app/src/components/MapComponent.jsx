@@ -20,11 +20,7 @@ function getCanhBao(tmax, tmin, wind, rain) {
 function createLabelIcon(name) {
   return L.divIcon({
     className: '',
-    html: `<div style="
-      font-size:10px;font-weight:bold;color:#000;
-      text-shadow:-1px -1px 0 #fff,1px -1px 0 #fff,-1px 1px 0 #fff,1px 1px 0 #fff,0 0 4px #fff;
-      white-space:nowrap;pointer-events:none;text-align:center;
-    ">${name}</div>`,
+    html: `<div style="font-size:10px;font-weight:bold;color:#000;text-shadow:-1px -1px 0 #fff,1px -1px 0 #fff,-1px 1px 0 #fff,1px 1px 0 #fff;white-space:nowrap;pointer-events:none;text-align:center;">${name}</div>`,
     iconAnchor: [0, 0],
   });
 }
@@ -32,13 +28,7 @@ function createLabelIcon(name) {
 function createIslandIcon(name) {
   return L.divIcon({
     className: '',
-    html: `<div style="
-      font-size:13px;font-weight:bold;color:#cc0000;
-      text-shadow:-1px -1px 0 #fff,1px -1px 0 #fff,-1px 1px 0 #fff,1px 1px 0 #fff,0 0 6px #fff;
-      white-space:nowrap;pointer-events:none;text-align:center;
-      background:rgba(255,255,255,0.7);padding:3px 6px;border-radius:4px;
-      border:1.5px solid #cc0000;
-    ">🇻🇳 ${name}</div>`,
+    html: `<div style="font-size:13px;font-weight:bold;color:#cc0000;text-shadow:-1px -1px 0 #fff,1px -1px 0 #fff,-1px 1px 0 #fff,1px 1px 0 #fff;white-space:nowrap;pointer-events:none;text-align:center;background:rgba(255,255,255,0.7);padding:3px 6px;border-radius:4px;border:1.5px solid #cc0000;">🇻🇳 ${name}</div>`,
     iconAnchor: [60, 10],
   });
 }
@@ -64,8 +54,7 @@ function MapComponent() {
         })).filter(f => f.name).sort((a, b) => a.name.localeCompare(b.name, 'vi'));
         setFeatureList(list);
         fetchAllWeather(data);
-      })
-      .catch(err => console.error('GeoJSON error:', err));
+      });
   }, []);
 
   const fetchAllWeather = async (data) => {
@@ -78,9 +67,7 @@ function MapComponent() {
         const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${center.lat}&longitude=${center.lng}&daily=temperature_2m_max&timezone=auto`);
         const d = await res.json();
         results[name] = d.daily?.temperature_2m_max?.[0] || null;
-      } catch {
-        results[name] = null;
-      }
+      } catch { results[name] = null; }
     }
     setWeatherById(results);
   };
@@ -96,22 +83,16 @@ function MapComponent() {
 
   const geoJsonStyle = (feature) => {
     const name = feature.properties.ten || feature.properties.Ten || feature.properties.name || '';
-    const temp = weatherById[name];
-    return { color: '#333', weight: 1.5, fillColor: getColorByTemperature(temp), fillOpacity: 0.65 };
+    return { color: '#333', weight: 1.5, fillColor: getColorByTemperature(weatherById[name]), fillOpacity: 0.65 };
   };
 
   const fetchWeather = async (center) => {
-    const lat = center.lat;
-    const lon = center.lng;
-    let urlMeteo = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,precipitation,windspeed_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,windspeed_10m_max&timezone=auto`;
-    if (selectedDate) urlMeteo += `&start_date=${selectedDate}&end_date=${selectedDate}`;
+    let url = `https://api.open-meteo.com/v1/forecast?latitude=${center.lat}&longitude=${center.lng}&hourly=temperature_2m,precipitation,windspeed_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,windspeed_10m_max&timezone=auto`;
+    if (selectedDate) url += `&start_date=${selectedDate}&end_date=${selectedDate}`;
     try {
-      const res = await fetch(urlMeteo);
-      const data = await res.json();
-      setWeatherData(data);
-    } catch (err) {
-      console.error('Lỗi Open-Meteo:', err);
-    }
+      const res = await fetch(url);
+      setWeatherData(await res.json());
+    } catch (err) { console.error(err); }
   };
 
   const selectFeatureByName = async (name) => {
@@ -139,50 +120,34 @@ function MapComponent() {
     layer.on({ click: handleFeatureClick });
   };
 
-  const handleRefresh = () => {
-    if (selectedFeature) fetchWeather(selectedFeature.center);
-  };
-
   const renderPopup = () => {
     if (!selectedFeature) return null;
-    if (!weatherData?.daily) {
-      return (
-        <Popup position={selectedFeature.center}>
-          <div style={{ padding: '10px' }}>⏳ Đang tải dữ liệu...</div>
-        </Popup>
-      );
-    }
+    if (!weatherData?.daily) return (
+      <Popup position={selectedFeature.center}>
+        <div style={{ padding: '10px' }}>⏳ Đang tải...</div>
+      </Popup>
+    );
     const { center, name } = selectedFeature;
     const daily = weatherData.daily;
     const tmax = daily.temperature_2m_max[0];
     const tmin = daily.temperature_2m_min[0];
     const rain = daily.precipitation_sum[0];
-    const wind = daily.windspeed_10m_max[0];
-    const windMs = parseFloat((wind / 3.6).toFixed(1));
+    const windMs = parseFloat((daily.windspeed_10m_max[0] / 3.6).toFixed(1));
     const warnings = getCanhBao(tmax, tmin, windMs, rain);
-
     return (
       <Popup position={center}>
-        <div style={{
-          fontSize: '14px', fontWeight: 'bold', lineHeight: '1.7', color: '#333',
-          border: '3px solid #2196f3', borderRadius: '8px', padding: '10px',
-          background: '#f5f5f5', boxShadow: '0 2px 10px rgba(0,0,0,0.3)', minWidth: '220px'
-        }}>
+        <div style={{ fontSize: '14px', fontWeight: 'bold', lineHeight: '1.7', color: '#333', border: '3px solid #2196f3', borderRadius: '8px', padding: '10px', background: '#f5f5f5', minWidth: '200px' }}>
           <div style={{ fontSize: '16px', color: '#2196f3', marginBottom: '4px' }}>{name}</div>
-          <div style={{ fontSize: '13px', marginBottom: '8px', fontWeight: 'normal' }}>
-            Ngày dự báo: {selectedDate || 'Hôm nay'}
-          </div>
+          <div style={{ fontSize: '13px', marginBottom: '8px', fontWeight: 'normal' }}>Ngày dự báo: {selectedDate || 'Hôm nay'}</div>
           <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>Trị số dự báo:</div>
           <div>🌡️ Tmax: {tmax}°C</div>
           <div>🌡️ Tmin: {tmin}°C</div>
           <div>☔ Mưa: {rain} mm</div>
-          <div>💨 Gió max: {windMs} m/s</div>
+          <div>💨 Gió: {windMs} m/s</div>
           {warnings.length > 0 ? (
             <div style={{ marginTop: '10px', padding: '8px', background: '#fff3cd', borderRadius: '6px', border: '1px solid #ffc107' }}>
               <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>⚠️ Cảnh báo thiên tai:</div>
-              {warnings.map((w, i) => (
-                <div key={i} style={{ color: w.color, fontWeight: 'bold', fontSize: '13px' }}>{w.text}</div>
-              ))}
+              {warnings.map((w, i) => <div key={i} style={{ color: w.color, fontWeight: 'bold', fontSize: '13px' }}>{w.text}</div>)}
             </div>
           ) : (
             <div style={{ marginTop: '10px', padding: '6px 8px', background: '#d4edda', borderRadius: '6px', border: '1px solid #28a745', color: '#155724', fontSize: '13px', fontWeight: 'bold' }}>
@@ -199,73 +164,51 @@ function MapComponent() {
     return geoData.features.map((feature, i) => {
       const name = feature.properties.ten || feature.properties.Ten || feature.properties.name || '';
       if (!name) return null;
-      const layer = L.geoJSON(feature);
-      const center = layer.getBounds().getCenter();
-      return (
-        <Marker key={i} position={[center.lat, center.lng]} icon={createLabelIcon(name)} interactive={false} />
-      );
+      const center = L.geoJSON(feature).getBounds().getCenter();
+      return <Marker key={i} position={[center.lat, center.lng]} icon={createLabelIcon(name)} interactive={false} />;
     });
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <h2 className="app-title">
-        DỰ BÁO THỜI TIẾT CHO XÃ/PHƯỜNG TỈNH QUẢNG TRỊ
-      </h2>
+    <div className="app-wrapper">
+      <h2 className="app-title">DỰ BÁO THỜI TIẾT CHO XÃ/PHƯỜNG TỈNH QUẢNG TRỊ</h2>
 
-      {/* Thanh công cụ: menu chọn địa danh + chọn ngày + làm mới */}
       <div className="toolbar">
-        <label style={{ fontWeight: 'bold', color: '#333' }}>📍 Chọn xã/phường:</label>
-        <select
-          value={selectedName}
-          onChange={(e) => { setSelectedName(e.target.value); selectFeatureByName(e.target.value); }}
-          style={{ fontSize: '15px', padding: '6px 10px', borderRadius: '6px', border: '1px solid #aaa', minWidth: '200px' }}
-        >
+        <label>📍 Chọn xã/phường:</label>
+        <select value={selectedName} onChange={(e) => { setSelectedName(e.target.value); selectFeatureByName(e.target.value); }}>
           <option value="">-- Chọn địa danh --</option>
-          {featureList.map((f, i) => (
-            <option key={i} value={f.name}>{f.name}</option>
-          ))}
+          {featureList.map((f, i) => <option key={i} value={f.name}>{f.name}</option>)}
         </select>
-
-        <label style={{ fontWeight: 'bold', color: '#333', marginLeft: '8px' }}>📅 Ngày dự báo:</label>
-        <input
-          type="date"
-          value={selectedDate}
-          onChange={(e) => setSelectedDate(e.target.value)}
-          style={{ fontSize: '15px', padding: '6px', borderRadius: '6px', border: '1px solid #aaa' }}
-        />
-
-        <button onClick={handleRefresh} style={{ marginLeft: '4px' }}>🔁 Làm mới</button>
-
-        <span className="toolbar-hint">
-          (Chọn ngày dự báo rồi nhớ click Làm mới)
-        </span>
+        <label>📅 Ngày:</label>
+        <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} />
+        <button onClick={() => selectedFeature && fetchWeather(selectedFeature.center)}>🔁 Làm mới</button>
+        <span className="toolbar-hint">(Chọn ngày rồi nhớ click Làm mới)</span>
       </div>
 
-      <div style={{ position: 'relative' }}>
+      {/* Biểu đồ đặt TRÊN bản đồ */}
+      {weatherData?.hourly && (
+        <div className="chart-wrapper">
+          <WeatherChart hourly={weatherData.hourly} regionName={selectedFeature?.name || ''} />
+        </div>
+      )}
+
+      {/* Bản đồ lấp đầy phần còn lại */}
+      <div className="map-wrapper">
         {geoData ? (
           <MapContainer center={[16.75, 107.1]} zoom={8} className="responsive-map" ref={mapRef}>
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
             <GeoJSON data={geoData} onEachFeature={onEachFeature} style={geoJsonStyle} key={JSON.stringify(weatherById)} />
             {renderLabels()}
-            {/* Label Hoàng Sa */}
             <Marker position={[16.5, 112.0]} icon={createIslandIcon('Đặc khu Hoàng Sa - Việt Nam')} interactive={false} />
-            {/* Label Trường Sa */}
             <Marker position={[10.5, 114.5]} icon={createIslandIcon('Đặc khu Trường Sa - Việt Nam')} interactive={false} />
             {renderPopup()}
           </MapContainer>
         ) : (
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '65vh' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
             ⏳ Đang tải bản đồ...
           </div>
         )}
       </div>
-
-      {weatherData?.hourly && (
-        <div style={{ padding: '10px', background: '#fff' }}>
-          <WeatherChart hourly={weatherData.hourly} regionName={selectedFeature?.name || ''} />
-        </div>
-      )}
     </div>
   );
 }
