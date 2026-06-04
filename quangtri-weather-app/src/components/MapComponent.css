@@ -1,9 +1,12 @@
 .responsive-map {
   width: 100%;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
+  height: 65vh;
+}
+
+@media (max-width: 768px) {
+  .responsive-map {
+    height: 50vh;
+  }
 }
 
 button {
@@ -24,4 +27,9 @@ input[type="date"] {
   font-size: 16px;
   padding: 6px;
   border-radius: 6px;
+}
+
+.chart-container {
+  width: 100%;
+  height: 200px;
 }
