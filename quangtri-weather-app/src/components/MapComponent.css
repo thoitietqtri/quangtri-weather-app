@@ -1,73 +1,48 @@
-.responsive-map {
-  width: 100%;
-  height: 60vh;
+/* Layout tổng thể */
+.app-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Tiêu đề */
+.app-title {
+  text-align: center;
+  padding: 10px;
+  margin: 0;
+  background: #FFD700;
+  color: #003399;
+  border-bottom: 2px solid #e6b800;
+  font-size: 20px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.15);
+  flex-shrink: 0;
 }
 
 @media (max-width: 768px) {
-  .responsive-map {
-    height: 45vh;
-  }
-}
-
-button {
-  font-size: 15px;
-  padding: 7px 12px;
-  border-radius: 8px;
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-button:hover {
-  background-color: #0056b3;
-}
-
-input[type="date"] {
-  font-size: 15px;
-  padding: 6px;
-  border-radius: 6px;
-  border: 1px solid #aaa;
-}
-
-@media (max-width: 768px) {
-  button {
-    font-size: 13px;
-    padding: 6px 10px;
-  }
-  input[type="date"] {
+  .app-title {
     font-size: 13px;
     padding: 5px;
   }
 }
 
-/* Biểu đồ */
-.chart-container {
-  width: 100%;
-  height: 121px;
-}
-
-@media (max-width: 768px) {
-  .chart-container {
-    height: 51px;
-  }
-}
-
 /* Toolbar */
 .toolbar {
-  padding: 8px 16px;
+  padding: 6px 16px;
   background: #f0f4ff;
   border-bottom: 1px solid #ddd;
   display: flex;
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
+  flex-shrink: 0;
 }
 
 @media (max-width: 768px) {
   .toolbar {
-    padding: 5px 8px;
+    padding: 4px 8px;
     gap: 5px;
   }
 }
@@ -87,7 +62,7 @@ input[type="date"] {
 
 .toolbar select {
   font-size: 14px;
-  padding: 6px 8px;
+  padding: 5px 8px;
   border-radius: 6px;
   border: 1px solid #aaa;
   min-width: 160px;
@@ -97,7 +72,7 @@ input[type="date"] {
 @media (max-width: 768px) {
   .toolbar select {
     font-size: 11px;
-    padding: 4px 6px;
+    padding: 3px 5px;
     min-width: 100px;
   }
 }
@@ -105,7 +80,7 @@ input[type="date"] {
 .toolbar-hint {
   font-style: italic;
   color: #007bff;
-  font-size: 13px;
+  font-size: 12px;
   width: 100%;
 }
 
@@ -115,24 +90,67 @@ input[type="date"] {
   }
 }
 
-/* Tiêu đề: chữ xanh nền vàng */
-.app-title {
-  text-align: center;
-  padding: 10px;
-  margin: 0;
-  background: #FFD700;
-  color: #003399;
-  border-bottom: 2px solid #e6b800;
-  font-size: 20px;
-  font-weight: bold;
-  letter-spacing: 1px;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.15);
+button {
+  font-size: 14px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
 }
 
 @media (max-width: 768px) {
-  .app-title {
-    font-size: 13px;
-    padding: 6px;
-    letter-spacing: 0px;
+  button {
+    font-size: 12px;
+    padding: 5px 8px;
   }
+}
+
+input[type="date"] {
+  font-size: 14px;
+  padding: 5px;
+  border-radius: 6px;
+  border: 1px solid #aaa;
+}
+
+@media (max-width: 768px) {
+  input[type="date"] {
+    font-size: 11px;
+    padding: 4px;
+  }
+}
+
+/* Biểu đồ */
+.chart-wrapper {
+  flex-shrink: 0;
+  background: #fff;
+  border-top: 1px solid #ddd;
+}
+
+.chart-container {
+  width: 100%;
+  height: 160px;
+}
+
+@media (max-width: 768px) {
+  .chart-container {
+    height: 100px;
+  }
+}
+
+/* Bản đồ lấp đầy phần còn lại */
+.map-wrapper {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.responsive-map {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
