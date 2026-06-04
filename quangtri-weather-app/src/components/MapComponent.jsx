@@ -143,7 +143,7 @@ function MapComponent() {
           <div>🌡️ Tmax: {tmax}°C</div>
           <div>🌡️ Tmin: {tmin}°C</div>
           <div>☔ Mưa: {rain} mm</div>
-          <div>💨 Gió: {windMs} m/s</div>
+          <div>💨 Gió Max: {windMs} m/s</div>
           {warnings.length > 0 ? (
             <div style={{ marginTop: '10px', padding: '8px', background: '#fff3cd', borderRadius: '6px', border: '1px solid #ffc107' }}>
               <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>⚠️ Cảnh báo thiên tai:</div>
