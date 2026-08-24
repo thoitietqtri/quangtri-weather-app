@@ -36,12 +36,29 @@ function createIslandIcon(name) {
 
 // Icon marker trạm đo mưa real-time — giọt nước xanh + nhãn tên trạm (đồng
 // bộ hình ảnh với dự án satloluquetkhesanh).
-function rainIcon(name) {
+// Phân cấp màu theo tổng mưa 24h.
+//   = 0mm            → xám
+//   >0  – <25mm       → xanh nước biển
+//   25 – 50mm         → xanh lá
+//   >50 – <100mm      → cam
+//   >=100mm           → đỏ + nhấp nháy
+function rainLevel(mm24h) {
+  const v = Number(mm24h) || 0;
+  if (v <= 0) return { color: '#9E9E9E', blink: false };
+  if (v < 25) return { color: '#1565C0', blink: false };
+  if (v <= 50) return { color: '#2E7D32', blink: false };
+  if (v < 100) return { color: '#EF6C00', blink: false };
+  return { color: '#D32F2F', blink: true };
+}
+
+function rainIcon(name, mm24h) {
+  const { color, blink } = rainLevel(mm24h);
+  const circleClass = `rain-marker__circle${blink ? ' rain-marker__circle--blink' : ''}`;
   return L.divIcon({
     className: 'rain-marker',
     html: `<div class="rain-marker__wrap">
-      <span class="rain-marker__circle"><svg viewBox="0 0 24 24" width="16" height="16" fill="#fff"><path d="M12 2C12 2 5 11 5 15.5A7 7 0 0 0 19 15.5C19 11 12 2 12 2Z"/></svg></span>
-      <span class="rain-marker__label">${name}</span>
+      <span class="${circleClass}" style="background:${color}"><svg viewBox="0 0 24 24" width="16" height="16" fill="#fff"><path d="M12 2C12 2 5 11 5 15.5A7 7 0 0 0 19 15.5C19 11 12 2 12 2Z"/></svg></span>
+      <span class="rain-marker__label" style="background:${color}">${name}</span>
     </div>`,
     iconSize: [110, 48],
     iconAnchor: [55, 15],
@@ -239,7 +256,7 @@ function MapComponent() {
             <Marker position={[16.5, 112.0]} icon={createIslandIcon('Đặc khu Hoàng Sa - Việt Nam')} interactive={false} />
             <Marker position={[10.5, 114.5]} icon={createIslandIcon('Đặc khu Trường Sa - Việt Nam')} interactive={false} />
             {showRain && rainStations.map((s) => (
-              <Marker key={s.id} position={[s.coords.lat, s.coords.lng]} icon={rainIcon(s.name)}>
+              <Marker key={s.id} position={[s.coords.lat, s.coords.lng]} icon={rainIcon(s.name, s.rain_24h)}>
                 <Popup>
                   <b>{s.name}</b><br />
                   1h: {s.rain_1h ?? '—'}mm · 3h: {s.rain_3h ?? '—'}mm · 6h: {s.rain_6h ?? '—'}mm<br />

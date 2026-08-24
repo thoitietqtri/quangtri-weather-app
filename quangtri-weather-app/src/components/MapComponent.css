@@ -155,13 +155,22 @@ input[type="date"] {
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background: #1565C0;
+  background: #9E9E9E;
   border: 2px solid #fff;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
 }
 
+.rain-marker__circle--blink {
+  animation: rain-marker-blink 1s ease-in-out infinite;
+}
+
+@keyframes rain-marker-blink {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.55; transform: scale(1.15); }
+}
+
 .rain-marker__label {
-  background: rgba(21, 101, 192, 0.92);
+  background: rgba(158, 158, 158, 0.92);
   color: #fff;
   font-size: 10px;
   font-weight: 700;
