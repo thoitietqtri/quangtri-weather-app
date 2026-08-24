@@ -122,6 +122,58 @@ input[type="date"] {
   }
 }
 
+.toolbar-rain-toggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.toolbar-rain-toggle input {
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .toolbar-rain-toggle {
+    font-size: 11px;
+  }
+}
+
+/* Marker trạm đo mưa real-time */
+.rain-marker__wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.rain-marker__circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #1565C0;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+
+.rain-marker__label {
+  background: rgba(21, 101, 192, 0.92);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 999px;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  max-width: 108px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* Biểu đồ */
 .chart-wrapper {
   flex-shrink: 0;

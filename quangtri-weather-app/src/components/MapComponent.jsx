@@ -4,6 +4,7 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import './MapComponent.css';
 import WeatherChart from './WeatherChart';
+import { getRainStations } from '../services/rainfall';
 
 function getCanhBao(tmax, tmin, wind, rain) {
   const warnings = [];
@@ -33,6 +34,23 @@ function createIslandIcon(name) {
   });
 }
 
+// Icon marker trạm đo mưa real-time — giọt nước xanh + nhãn tên trạm (đồng
+// bộ hình ảnh với dự án satloluquetkhesanh).
+function rainIcon(name) {
+  return L.divIcon({
+    className: 'rain-marker',
+    html: `<div class="rain-marker__wrap">
+      <span class="rain-marker__circle"><svg viewBox="0 0 24 24" width="16" height="16" fill="#fff"><path d="M12 2C12 2 5 11 5 15.5A7 7 0 0 0 19 15.5C19 11 12 2 12 2Z"/></svg></span>
+      <span class="rain-marker__label">${name}</span>
+    </div>`,
+    iconSize: [110, 48],
+    iconAnchor: [55, 15],
+  });
+}
+
+// Trạm mưa cập nhật lại sau mỗi khoảng thời gian này (mili-giây).
+const RAIN_REFRESH_MS = 10 * 60 * 1000;
+
 function MapComponent() {
   const [selectedFeature, setSelectedFeature] = useState(null);
   const [weatherData, setWeatherData] = useState(null);
@@ -41,6 +59,8 @@ function MapComponent() {
   const [geoData, setGeoData] = useState(null);
   const [featureList, setFeatureList] = useState([]);
   const [selectedName, setSelectedName] = useState('');
+  const [rainStations, setRainStations] = useState([]);
+  const [showRain, setShowRain] = useState(true);
   const mapRef = useRef(null);
 
   useEffect(() => {
@@ -55,6 +75,19 @@ function MapComponent() {
         setFeatureList(list);
         fetchAllWeather(data);
       });
+  }, []);
+
+  // Trạm mưa real-time: tải lần đầu rồi tự làm mới định kỳ.
+  useEffect(() => {
+    let cancelled = false;
+    const loadRain = () => {
+      getRainStations()
+        .then((stations) => { if (!cancelled) setRainStations(stations); })
+        .catch((err) => console.error('[Mưa] Lỗi tải trạm:', err));
+    };
+    loadRain();
+    const timer = setInterval(loadRain, RAIN_REFRESH_MS);
+    return () => { cancelled = true; clearInterval(timer); };
   }, []);
 
   const fetchAllWeather = async (data) => {
@@ -183,6 +216,10 @@ function MapComponent() {
         <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} />
         <button onClick={() => selectedFeature && fetchWeather(selectedFeature.center)}>🔁 Làm mới</button>
         <span className="toolbar-hint">(Chọn ngày rồi nhớ click Làm mới)</span>
+        <label className="toolbar-rain-toggle">
+          <input type="checkbox" checked={showRain} onChange={(e) => setShowRain(e.target.checked)} />
+          💧 Trạm mưa real-time
+        </label>
       </div>
 
       {/* Biểu đồ đặt TRÊN bản đồ */}
@@ -201,6 +238,15 @@ function MapComponent() {
             {renderLabels()}
             <Marker position={[16.5, 112.0]} icon={createIslandIcon('Đặc khu Hoàng Sa - Việt Nam')} interactive={false} />
             <Marker position={[10.5, 114.5]} icon={createIslandIcon('Đặc khu Trường Sa - Việt Nam')} interactive={false} />
+            {showRain && rainStations.map((s) => (
+              <Marker key={s.id} position={[s.coords.lat, s.coords.lng]} icon={rainIcon(s.name)}>
+                <Popup>
+                  <b>{s.name}</b><br />
+                  1h: {s.rain_1h ?? '—'}mm · 3h: {s.rain_3h ?? '—'}mm · 6h: {s.rain_6h ?? '—'}mm<br />
+                  24h: {s.rain_24h ?? '—'}mm · 48h: {s.rain_48h ?? '—'}mm · 72h: {s.rain_72h ?? '—'}mm
+                </Popup>
+              </Marker>
+            ))}
             {renderPopup()}
           </MapContainer>
         ) : (
