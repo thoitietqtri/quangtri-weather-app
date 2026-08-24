@@ -239,6 +239,16 @@ function MapComponent() {
         </label>
       </div>
 
+      {showRain && (
+        <div className="rain-legend">
+          <span className="rain-legend__item"><span className="rain-legend__dot" style={{ background: '#9E9E9E' }} />0mm</span>
+          <span className="rain-legend__item"><span className="rain-legend__dot" style={{ background: '#1565C0' }} />&lt;25mm</span>
+          <span className="rain-legend__item"><span className="rain-legend__dot" style={{ background: '#2E7D32' }} />25-50mm</span>
+          <span className="rain-legend__item"><span className="rain-legend__dot" style={{ background: '#EF6C00' }} />50-100mm</span>
+          <span className="rain-legend__item"><span className="rain-legend__dot rain-legend__dot--blink" style={{ background: '#D32F2F' }} />&gt;100mm</span>
+        </div>
+      )}
+
       {/* Biểu đồ đặt TRÊN bản đồ */}
       {weatherData?.hourly && (
         <div className="chart-wrapper">

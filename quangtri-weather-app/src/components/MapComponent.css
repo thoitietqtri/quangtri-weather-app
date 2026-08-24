@@ -140,7 +140,47 @@ input[type="date"] {
   }
 }
 
+/* Chú giải màu trạm mưa (theo mức mưa 24h) */
+.rain-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 12px 8px;
+  font-size: 12px;
+  color: #555;
+}
+
+.rain-legend__item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.rain-legend__dot {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 1.5px solid #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
+}
+
+.rain-legend__dot--blink {
+  animation: rain-marker-blink 1s ease-in-out infinite;
+}
+
+@media (max-width: 768px) {
+  .rain-legend {
+    font-size: 10px;
+    gap: 8px;
+  }
+}
+
 /* Marker trạm đo mưa real-time */
+
+
 .rain-marker__wrap {
   display: flex;
   flex-direction: column;
