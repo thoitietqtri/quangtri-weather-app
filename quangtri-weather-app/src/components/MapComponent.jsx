@@ -245,7 +245,7 @@ function MapComponent() {
           <span className="rain-legend__item"><span className="rain-legend__dot" style={{ background: '#1565C0' }} />&lt;25mm/24h</span>
           <span className="rain-legend__item"><span className="rain-legend__dot" style={{ background: '#2E7D32' }} />25-50mm/24h</span>
           <span className="rain-legend__item"><span className="rain-legend__dot" style={{ background: '#EF6C00' }} />50-100mm/24h</span>
-          <span className="rain-legend__item"><span className="rain-legend__dot rain-legend__dot--blink" style={{ background: '#D32F2F' }} />&gt;100mm/h</span>
+          <span className="rain-legend__item"><span className="rain-legend__dot rain-legend__dot--blink" style={{ background: '#D32F2F' }} />&gt;100mm/24h</span>
         </div>
       )}
 
