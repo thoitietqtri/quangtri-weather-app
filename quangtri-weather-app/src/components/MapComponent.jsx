@@ -36,7 +36,7 @@ function createIslandIcon(name) {
 
 // Icon marker trạm đo mưa real-time — giọt nước xanh + nhãn tên trạm (đồng
 // bộ hình ảnh với dự án satloluquetkhesanh).
-// Phân cấp màu theo tổng mưa 24h.
+// Phân cấp màu theo tổng mưa 24h — trả về { color, blink }.
 //   = 0mm            → xám
 //   >0  – <25mm       → xanh nước biển
 //   25 – 50mm         → xanh lá
@@ -114,7 +114,7 @@ function MapComponent() {
       const layer = L.geoJSON(feature);
       const center = layer.getBounds().getCenter();
       try {
-        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${center.lat}&longitude=${center.lng}&daily=temperature_2m_max&timezone=auto`);
+        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${center.lat}&longitude=${center.lng}&daily=temperature_2m_max&timezone=auto&models=ecmwf_ifs`);
         const d = await res.json();
         results[name] = d.daily?.temperature_2m_max?.[0] || null;
       } catch { results[name] = null; }
@@ -146,7 +146,7 @@ function MapComponent() {
   })();
 
   const fetchWeather = async (center) => {
-    let url = `https://api.open-meteo.com/v1/forecast?latitude=${center.lat}&longitude=${center.lng}&hourly=temperature_2m,precipitation,windspeed_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,windspeed_10m_max&timezone=auto`;
+    let url = `https://api.open-meteo.com/v1/forecast?latitude=${center.lat}&longitude=${center.lng}&hourly=temperature_2m,precipitation,windspeed_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,windspeed_10m_max&timezone=auto&models=ecmwf_ifs`;
     if (selectedDate) url += `&start_date=${selectedDate}&end_date=${selectedDate}`;
     try {
       const res = await fetch(url);
@@ -232,7 +232,7 @@ function MapComponent() {
     <div className="app-wrapper">
       <h2 className="app-title">
         <span className="app-title__icon" aria-hidden="true">⛅</span>
-        DỰ BÁO THỜI TIẾT TỈNH QUẢNG TRỊ
+        DỰ BÁO THỜI TIẾT XÃ/PHƯỜNG TỈNH QUẢNG TRỊ
         <span className="app-title__icon" aria-hidden="true">⛅</span>
       </h2>
 
@@ -254,11 +254,11 @@ function MapComponent() {
 
       {showRain && (
         <div className="rain-legend">
-          <span className="rain-legend__item"><span className="rain-legend__dot" style={{ background: '#9E9E9E' }} />0mm/24h</span>
-          <span className="rain-legend__item"><span className="rain-legend__dot" style={{ background: '#1565C0' }} />&lt;25mm/24h</span>
-          <span className="rain-legend__item"><span className="rain-legend__dot" style={{ background: '#2E7D32' }} />25-50mm/24h</span>
-          <span className="rain-legend__item"><span className="rain-legend__dot" style={{ background: '#EF6C00' }} />50-100mm/24h</span>
-          <span className="rain-legend__item"><span className="rain-legend__dot rain-legend__dot--blink" style={{ background: '#D32F2F' }} />&gt;100mm/24h</span>
+          <span className="rain-legend__item"><span className="rain-legend__dot" style={{ background: '#9E9E9E' }} />0mm</span>
+          <span className="rain-legend__item"><span className="rain-legend__dot" style={{ background: '#1565C0' }} />&lt;25mm</span>
+          <span className="rain-legend__item"><span className="rain-legend__dot" style={{ background: '#2E7D32' }} />25-50mm</span>
+          <span className="rain-legend__item"><span className="rain-legend__dot" style={{ background: '#EF6C00' }} />50-100mm</span>
+          <span className="rain-legend__item"><span className="rain-legend__dot rain-legend__dot--blink" style={{ background: '#D32F2F' }} />&gt;100mm</span>
         </div>
       )}
 
