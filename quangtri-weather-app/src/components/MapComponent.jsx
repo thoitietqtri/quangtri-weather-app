@@ -6,6 +6,7 @@ import './MapComponent.css';
 import WeatherChart from './WeatherChart';
 import { getRainStations } from '../services/rainfall';
 import RainTable from './RainTable';
+import ForecastTable from './ForecastTable';
 import VisitCounter from './VisitCounter';
 
 function getCanhBao(tmax, tmin, wind, rain) {
@@ -82,6 +83,7 @@ function MapComponent() {
   const [rainStations, setRainStations] = useState([]);
   const [showRain, setShowRain] = useState(true);
   const [showRainTable, setShowRainTable] = useState(false);
+  const [showForecastTable, setShowForecastTable] = useState(false);
   const mapRef = useRef(null);
 
   useEffect(() => {
@@ -261,7 +263,7 @@ function MapComponent() {
       <VisitCounter />
       <h2 className="app-title">
         <span className="app-title__icon" aria-hidden="true">⛅</span>
-        DỰ BÁO THỜI TIẾT TỈNH QUẢNG TRỊ
+        DỰ BÁO THỜI TIẾT CHO XÃ/PHƯỜNG TỈNH QUẢNG TRỊ
         <span className="app-title__icon" aria-hidden="true">⛅</span>
       </h2>
 
@@ -286,10 +288,22 @@ function MapComponent() {
           <input type="checkbox" checked={showRain} onChange={(e) => setShowRain(e.target.checked)} />
           💧 Trạm mưa real-time
         </label>
-        <button onClick={() => setShowRainTable(true)}>📊 Bảng mưa thực đo</button>
+        <button onClick={() => setShowRainTable(true)}>📊 Bảng mưa chi tiết</button>
+        <button onClick={() => setShowForecastTable(true)}>📅 Dự báo 7 ngày</button>
       </div>
 
       {showRainTable && <RainTable stations={rainStations} onClose={() => setShowRainTable(false)} />}
+      {showForecastTable && (
+        <ForecastTable
+          xaList={featureList.map((f) => {
+            const layer = L.geoJSON(f.feature);
+            const c = layer.getBounds().getCenter();
+            return { ten_xa: f.name, lat: c.lat, lng: c.lng };
+          })}
+          forecastApiUrl="https://api.open-meteo.com/v1/forecast"
+          onClose={() => setShowForecastTable(false)}
+        />
+      )}
 
       {showRain && (
         <div className="rain-legend">
