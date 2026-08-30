@@ -5,7 +5,7 @@ const TABS = [
   { key: 'rain', label: '🌧️ Mưa (mm)' },
   { key: 'tmax', label: '🌡️ Tmax (°C)' },
   { key: 'tmin', label: '❄️ Tmin (°C)' },
-  { key: 'wind', label: '💨 Gió (km/h)' },
+  { key: 'wind', label: '💨 Gió (m/s)' },
 ];
 
 // Ngưỡng màu — mưa dùng ĐÚNG thang đã thống nhất ở Bảng mưa chi tiết, nhiệt
@@ -24,11 +24,11 @@ function tempColor(c) {
   if (c < 33) return { bg: '#F9A825', fg: '#000' };
   return { bg: '#D32F2F', fg: '#fff' };
 }
-function windColor(kmh) {
-  if (kmh == null) return { bg: '#f0f0f0', fg: '#999' };
-  if (kmh < 20) return { bg: '#2E7D32', fg: '#fff' };
-  if (kmh < 40) return { bg: '#F9A825', fg: '#000' };
-  if (kmh < 60) return { bg: '#EF6C00', fg: '#fff' };
+function windColor(ms) {
+  if (ms == null) return { bg: '#f0f0f0', fg: '#999' };
+  if (ms < 6) return { bg: '#2E7D32', fg: '#fff' };
+  if (ms < 11) return { bg: '#F9A825', fg: '#000' };
+  if (ms < 17) return { bg: '#EF6C00', fg: '#fff' };
   return { bg: '#D32F2F', fg: '#fff' };
 }
 const COLOR_FN = { rain: rainColor, tmax: tempColor, tmin: tempColor, wind: windColor };
@@ -36,7 +36,7 @@ const LEGEND = {
   rain: [['#1565C0', '0-25mm'], ['#2E7D32', '>25-50mm'], ['#F9A825', '>50-100mm'], ['#D32F2F', '>100mm']],
   tmax: [['#1565C0', '<20°C'], ['#2E7D32', '20-27°C'], ['#F9A825', '27-33°C'], ['#D32F2F', '>33°C']],
   tmin: [['#1565C0', '<20°C'], ['#2E7D32', '20-27°C'], ['#F9A825', '27-33°C'], ['#D32F2F', '>33°C']],
-  wind: [['#2E7D32', '<20km/h'], ['#F9A825', '20-40km/h'], ['#EF6C00', '40-60km/h'], ['#D32F2F', '>60km/h']],
+  wind: [['#2E7D32', '<6m/s'], ['#F9A825', '6-11m/s'], ['#EF6C00', '11-17m/s'], ['#D32F2F', '>17m/s']],
 };
 
 function formatDateLabel(iso) {
@@ -56,7 +56,7 @@ export default function ForecastTable({ xaList, forecastApiUrl, onClose }) {
     const lats = xaList.map((x) => x.lat).join(',');
     const lngs = xaList.map((x) => x.lng).join(',');
     const url = `${forecastApiUrl}?latitude=${lats}&longitude=${lngs}`
-      + `&daily=precipitation_sum,temperature_2m_max,temperature_2m_min,windspeed_10m_max&forecast_days=7&timezone=auto&models=ecmwf_ifs`;
+      + `&daily=precipitation_sum,temperature_2m_max,temperature_2m_min,windspeed_10m_max&forecast_days=10&timezone=auto&models=ecmwf_ifs&wind_speed_unit=ms`;
 
     fetch(url)
       .then((r) => r.json())
@@ -79,7 +79,7 @@ export default function ForecastTable({ xaList, forecastApiUrl, onClose }) {
     <div className="forecast-table-overlay" onClick={onClose}>
       <div className="forecast-table-panel" onClick={(e) => e.stopPropagation()}>
         <div className="forecast-table-header">
-          <h3>📅 Dự báo 7 ngày cho các xã/phường</h3>
+          <h3>📅 Dự báo 10 ngày cho các xã/phường</h3>
           <button className="forecast-table-close" onClick={onClose} aria-label="Đóng">✕</button>
         </div>
 

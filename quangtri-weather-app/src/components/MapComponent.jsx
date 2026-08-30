@@ -289,7 +289,7 @@ function MapComponent() {
           💧 Trạm mưa real-time
         </label>
         <button onClick={() => setShowRainTable(true)}>📊 Bảng mưa chi tiết</button>
-        <button onClick={() => setShowForecastTable(true)}>📅 Dự báo 7 ngày</button>
+        <button onClick={() => setShowForecastTable(true)}>📅 Dự báo 10 ngày</button>
       </div>
 
       {showRainTable && <RainTable stations={rainStations} onClose={() => setShowRainTable(false)} />}
