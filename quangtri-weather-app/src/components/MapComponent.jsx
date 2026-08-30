@@ -288,8 +288,8 @@ function MapComponent() {
           <input type="checkbox" checked={showRain} onChange={(e) => setShowRain(e.target.checked)} />
           💧 Trạm mưa real-time
         </label>
-        <button onClick={() => setShowRainTable(true)}>📊 Bảng mưa chi tiết</button>
-        <button onClick={() => setShowForecastTable(true)}>📅 Dự báo 10 ngày</button>
+        <button onClick={() => setShowRainTable(true)}>📊 Bảng mưa thực đo</button>
+        <button onClick={() => setShowForecastTable(true)}>📅 Bảng Dự báo 10 ngày tới</button>
       </div>
 
       {showRainTable && <RainTable stations={rainStations} onClose={() => setShowRainTable(false)} />}
