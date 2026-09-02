@@ -144,12 +144,12 @@ function MapComponent() {
     return { color: '#333', weight: 1.5, fillColor: getColorByTemperature(weatherById[name]), fillOpacity: 0.65 };
   };
 
-  // Open-Meteo chỉ trả dự báo tối đa 16 ngày (hôm nay + 15 ngày tiếp theo).
+  // ECMWF IFS chỉ trả dự báo tối đa 15 ngày (hôm nay + 14 ngày tiếp theo).
   // Tính ngày xa nhất được phép chọn để gắn vào thuộc tính `max` của ô lịch —
   // trình duyệt tự làm xám/chặn click các ngày sau đó, không cần tự vẽ lịch.
   const maxSelectableDate = (() => {
     const d = new Date();
-    d.setDate(d.getDate() + 15);
+    d.setDate(d.getDate() + 14);
     return d.toISOString().slice(0, 10);
   })();
 
@@ -265,7 +265,7 @@ function MapComponent() {
       <VisitCounter />
       <h2 className="app-title">
         <span className="app-title__icon" aria-hidden="true">⛅</span>
-        THỜI TIẾT TỈNH QUẢNG TRỊ
+        THỜI TIẾT QUẢNG TRỊ
         <span className="app-title__icon" aria-hidden="true">⛅</span>
       </h2>
 
@@ -290,8 +290,8 @@ function MapComponent() {
           <input type="checkbox" checked={showRain} onChange={(e) => setShowRain(e.target.checked)} />
           💧 Trạm mưa real-time
         </label>
-        <button onClick={() => setShowRainTable(true)}>📊 Bảng mưa chi tiết</button>
-        <button onClick={() => setShowForecastTable(true)}>📅 Dự báo 10 ngày</button>
+        <button onClick={() => setShowRainTable(true)}>📊 Số liệu mưa thực đo </button>
+        <button onClick={() => setShowForecastTable(true)}>📅Số liệu dự báo 10 ngày tiếp</button>
       </div>
 
       {showRainTable && <RainTable stations={rainStations} onClose={() => setShowRainTable(false)} />}
