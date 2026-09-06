@@ -270,32 +270,34 @@ function MapComponent() {
       </h2>
 
       <div className="toolbar">
-        <label>📍 Chọn xã/phường:</label>
-        <select value={selectedName} onChange={(e) => { setSelectedName(e.target.value); selectFeatureByName(e.target.value); }}>
-          <option value="">-- Chọn địa danh --</option>
-          {featureList.map((f, i) => <option key={i} value={f.name}>{f.name}</option>)}
-        </select>
-        <label>📅 Ngày:</label>
-        <input
-          type="date"
-          value={selectedDate}
-          max={maxSelectableDate}
-          onChange={(e) => {
-            let newDate = e.target.value;
-            // Chặn cứng phía JS — một số trình duyệt di động (Android/Chrome)
-            // không tự làm mờ ngày vượt "max" trên giao diện lịch gốc, nên
-            // không thể chỉ dựa vào thuộc tính max của thẻ input.
-            if (newDate > maxSelectableDate) newDate = maxSelectableDate;
-            setSelectedDate(newDate);
-            if (selectedFeature) fetchWeather(selectedFeature.center, newDate);
-          }}
-        />
+        <div className="toolbar-row-xa-ngay">
+          <label>📍 <span className="toolbar-label-text">Chọn xã/phường:</span></label>
+          <select value={selectedName} onChange={(e) => { setSelectedName(e.target.value); selectFeatureByName(e.target.value); }}>
+            <option value="">-- Chọn địa danh --</option>
+            {featureList.map((f, i) => <option key={i} value={f.name}>{f.name}</option>)}
+          </select>
+          <label>📅 <span className="toolbar-label-text">Ngày:</span></label>
+          <input
+            type="date"
+            value={selectedDate}
+            max={maxSelectableDate}
+            onChange={(e) => {
+              let newDate = e.target.value;
+              // Chặn cứng phía JS — một số trình duyệt di động (Android/Chrome)
+              // không tự làm mờ ngày vượt "max" trên giao diện lịch gốc, nên
+              // không thể chỉ dựa vào thuộc tính max của thẻ input.
+              if (newDate > maxSelectableDate) newDate = maxSelectableDate;
+              setSelectedDate(newDate);
+              if (selectedFeature) fetchWeather(selectedFeature.center, newDate);
+            }}
+          />
+        </div>
         <label className="toolbar-rain-toggle">
           <input type="checkbox" checked={showRain} onChange={(e) => setShowRain(e.target.checked)} />
           💧 Trạm mưa real-time
         </label>
-        <button onClick={() => setShowRainTable(true)}>📊 Số liệu mưa thực đo</button>
-        <button onClick={() => setShowForecastTable(true)}>📅 Dự báo 10 ngày tiếp</button>
+        <button onClick={() => setShowRainTable(true)}>📊 Mưa thực đo</button>
+        <button onClick={() => setShowForecastTable(true)}>📅 Dự báo 10 ngày</button>
       </div>
 
       {showRainTable && <RainTable stations={rainStations} onClose={() => setShowRainTable(false)} />}
